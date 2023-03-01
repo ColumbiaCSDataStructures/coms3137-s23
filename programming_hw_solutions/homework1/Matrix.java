@@ -39,12 +39,19 @@ public class Matrix<T> {
 
   public void transpose() {
     
+
+    // Runtime with ArrayList: O(N^2) 
+    // Runtime with LinkedList: O(N^3)
+
     List<List<T>> newData = new ArrayList<>();
 
-    for (int j = 0; j < width; j++){
-      ArrayList<T> newRow = new ArrayList<>();     
+    for (int j = 0; j < width; j++){  // N times 
+      ArrayList<T> newRow = new ArrayList<>();   // N times  
       for (int i = 0; i < height; i++) {
-        newRow.add(data.get(i).get(j));
+
+        newRow.add(data.get(i).get(j)); // with LinkedList: O(N) + O(N) = O(N).
+                                        // with ArrayList: O(1) 
+
       }
       newData.add(newRow);
     }
