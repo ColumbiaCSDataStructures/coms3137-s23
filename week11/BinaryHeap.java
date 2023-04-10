@@ -13,7 +13,7 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
     private static final int DEFAULT_CAPACITY = 100;
     private int currentSize; // Number of elements in heap
-    private T [ ] array; // The heap array
+    private T[ ] array; // The heap array
 
     /**
      * Construct the binary heap.
@@ -69,11 +69,11 @@ public class BinaryHeap<T extends Comparable<? super T>> {
 
         // percolate up
         while (position > 1 && (x.compareTo(array[position / 2]) < 0)) {
-                array[position] = array[position / 2];
+                array[position] = array[position / 2]; // copy value of parent down
                 position = position / 2;     
         }
         
-        array[position] = x; 
+        array[position] = x;  // write x into the hole i just opened up 
     }
 
     /**
@@ -97,7 +97,7 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         T minItem = findMin( );
         T last = array[currentSize];
         array[currentSize--] = null;
-        array[ 1 ] = last; 
+        array[ 1 ] = last; // copy the value of the last node to the root 
         percolateDown( 1 );
 
         return minItem;
@@ -112,6 +112,16 @@ public class BinaryHeap<T extends Comparable<? super T>> {
             percolateDown( i );
     }
 
+    private void heapSort() {
+      buildHeap(); 
+      while (currentSize > 1) {
+        T x = deleteMin();
+        array[currentSize + 1] = x; //note: this sorts the array in decreasing order
+                                    // because this is a minHeap
+      }
+
+    }
+
     /**
      * Internal method to percolate down in the heap.
      * @param hole the index at which the percolate begins.
@@ -122,7 +132,7 @@ public class BinaryHeap<T extends Comparable<? super T>> {
         T tmp = array[position];
         while (flag && position*2 <= currentSize) {
 
-            // obtain left child content
+            // obtain left child index 
             int child = position * 2;
 
             // if right child exists: 
@@ -134,13 +144,15 @@ public class BinaryHeap<T extends Comparable<? super T>> {
             }
             // now child is the index of the smaller one of the two children 
 
+            // compare value of the smaller child to value of the parent
             if (array[child].compareTo(array[position]) < 0) {
-                array[position] = array[child];
+                array[position] = array[child]; // copy child value up
             } else {
                 flag = false;
             }
             position = child;
-        }
+        } // now position points to the correct index.
+        
         array[position] = tmp; 
 
     }

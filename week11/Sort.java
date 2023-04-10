@@ -40,22 +40,57 @@ public class Sort {
         } 
 
 
-        public static void merge(Integer[] arr, int aCtr, int bCtr, int rightEnd) {
+        public static void merge(Integer[] arr, Integer[] tmp,  int aCtr, int bCtr, int rightEnd) {
+          
+          // aCtr: beginning of left partition
+          // bCtr: beginning of right partition 
+          // rightEnd: end of the right partition 
+          int leftEnd = bCtr -1; // end of the left partition
+          int numElements = rightEnd - aCtr + 1;  
+          
+          int cCtr = aCtr;
+
+          while (aCtr <= leftEnd && bCtr <= rightEnd) {
+            if (arr[aCtr] <= arr[bCtr]) {
+              tmp[cCtr++] = arr[aCtr++];
+            } else {
+              tmp[cCtr++] = arr[bCtr++];
+            }
+          }          
+         
+          // only one of the following while loops will run 
+          // copy remaining elements from left partition
+          while (aCtr <= leftEnd) 
+            tmp[cCtr++] = arr[aCtr++];
+          // copy remaining elements from left partition
+          while (bCtr <= rightEnd) 
+            tmp[cCtr++] = arr[bCtr++];
+
+          for (int i = 0; i < numElements; i ++) {
+            arr[rightEnd] = tmp[rightEnd];
+            rightEnd--;
+          } 
 
         }
 
         public static void mergeSort(Integer[] arr) {
-          mergeSortRecursive(arr, 0, arr.length-1);
+          Integer[] tmp = new Integer[arr.length];
+          mergeSortRecursive(arr, tmp, 0, arr.length-1);
         }
 
-        public static void mergeSortRecursive(Integer[] arr, int left, int right) {
-
+        public static void mergeSortRecursive(Integer[] arr, Integer[] tmp, int left, int right) {
+          if (left < right) {
+            int center = (left + right) / 2; 
+            mergeSortRecursive(arr, tmp, left, center);
+            mergeSortRecursive(arr, tmp, center + 1, right);  
+            merge(arr, tmp, left, center + 1, right);
+          }
         }
 
 
         public static void main(String[] args) {
             
-            Integer[] test = {1,7,3,2,9,8,4,5,6};
+            /*Integer[] test = {1,7,3,2,9,8,4,5,6};
                 
             insertionSort(test);
             
@@ -63,18 +98,18 @@ public class Sort {
                 System.out.print(i);
                 System.out.print(" ");
             }
-            System.out.println();
+            System.out.println();*/
 
             //MERGE TEST CASE
-            /*Integer[] test = {1,3,4,7,  2,5,9,12};
-            merge(test,0,4,7);
-            
+            Integer[] test = {1,3,4,7,2,5,9,12,0,4,3,2,6};
+            //merge(test,2,6,9);
+            mergeSort(test);           
+ 
             for (Integer i :test) {
                 System.out.print(i);
                 System.out.print(" ");
             }
             System.out.println();
-            */
             
         }
 }
