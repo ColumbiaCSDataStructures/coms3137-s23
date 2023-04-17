@@ -8,21 +8,21 @@ import java.util.Deque;
 public class BasicGraph<V> { 
    
     // Keep an index from node labels to nodes in the map
-    protected Map<V, Vertex<V>> vertices; 
+    protected Map<V, Vertex> vertices; 
 
     /**
      * Construct an empty Graph.
      */
     public BasicGraph() {
-       vertices = new HashMap<V, Vertex<V>>();
+       vertices = new HashMap<V, Vertex>();
     }
 
     
     public void addVertex(V u) {
-        addVertex(new Vertex<>(u));
+        addVertex(new Vertex(u));
     }
     
-    public void addVertex(Vertex<V> v) {
+    public void addVertex(Vertex v) {
         if (vertices.containsKey(v.name)) 
             throw new IllegalArgumentException("Cannot create new vertex with existing name.");
         vertices.put(v.name, v);
@@ -41,12 +41,10 @@ public class BasicGraph<V> {
         if (!vertices.containsKey(w))
             addVertex(w);
 
-        Vertex<V> uvertex = vertices.get(u);
+        Vertex uvertex = vertices.get(u);
+        Vertex wvertex = vertices.get(w);
         uvertex.adjacent.add(
-            new Edge<V>(uvertex, vertices.get(w), cost)); 
-
-
-
+            new Edge(uvertex, wvertex, cost)); 
     }
 
     public void addEdge(V u, V w){
@@ -68,12 +66,12 @@ public class BasicGraph<V> {
     }    
 
 
-    protected class Edge<V> {
-        Vertex<V> source;
-        Vertex<V> target;
+    protected class Edge {
+        Vertex source;
+        Vertex target;
         Integer cost;
 
-        public Edge(Vertex<V> source, Vertex<V> target, Integer cost){
+        public Edge(Vertex source, Vertex target, Integer cost){
             this.source = source;
             this.target = target;
             this.cost = cost;
@@ -81,12 +79,14 @@ public class BasicGraph<V> {
 
     }
 
-    protected class Vertex<V> {
+    protected class Vertex {
         public V name;
-        private List<Edge<V>> adjacent;
+        private List<Edge> adjacent;
+
+        // not needed for now
         int indegree; 
         double cost; // length of shortest incoming path
-        Vertex<V> prev; 
+        Vertex prev; 
 
         /**
          * Construct a new vertex containing an adjacency list.
@@ -94,7 +94,7 @@ public class BasicGraph<V> {
          */
         public Vertex(V vertexName){
             name = vertexName;
-            adjacent = new LinkedList<Edge<V>>(); 
+            adjacent = new LinkedList<Edge>(); 
             indegree = 0; 
             cost = Double.POSITIVE_INFINITY;
         }
@@ -107,10 +107,47 @@ public class BasicGraph<V> {
 
     public void computeIndegrees() {
 
+      for (V vname : vertices.keySet()) {
+        Vertex v = vertices.get(vname);  // for each vertex
+        for (Edge vw : v.adjacent) { // look at all outgoing edges
+          Vertex w = vw.target;      // find the target vertex w
+          w.indegree++;                 //   and increment w's indegree
+        }
+      }
+      
+      for (Vertex v : vertices.values()) {
+        System.out.println(v.toString() + ": "+ Integer.toString(v.indegree));
+      }
+      
     }
 
     public List<V> topo_sort() {
-      return null;
+
+      computeIndegrees(); // compute the indegree of each vertex      
+
+      List<V> result = new LinkedList<>(); 
+
+      LinkedList<Vertex> queue = new LinkedList<>(); 
+
+      // enqueue all vertices with indegree 0 
+      for (Vertex v : vertices.values()) {
+        if (v.indegree == 0) {
+          queue.addFirst(v);
+        }
+      }
+
+      while (queue.size() > 0) { // while the queue is not empty
+    
+        Vertex v = queue.pollLast();  // dequeue
+        result.add(v.name); 
+        for (Edge vw : v.adjacent) {
+          Vertex w = vw.target;
+          w.indegree--; 
+          if (w.indegree == 0)
+            queue.addFirst(w); 
+        } 
+      }
+      return result;
     }
 
     public void bfs_shortest_path(V start) {
@@ -124,6 +161,7 @@ public class BasicGraph<V> {
    
     public static void main(String[] args) {
         BasicGraph<String> g = new BasicGraph<>();
+
         g.addEdge("v1","v2");
         g.addEdge("v1","v3");
         g.addEdge("v2","v4");
